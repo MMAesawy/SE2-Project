@@ -1,11 +1,14 @@
 package project;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 public class UserManager {
     protected ArrayList<User> users;
+    protected DatabaseManager dbManager;
 
     public UserManager(){
+        dbManager = DatabaseManager.getInstance();
         loadUsers();
     }
 
@@ -32,7 +35,7 @@ public class UserManager {
      * @return whether or not the username is available
      */
     public boolean checkUsernameAvailability(String username){
-
+        return false;
     }
 
     /**
@@ -41,7 +44,7 @@ public class UserManager {
      * @return whether or not the email is available
      */
     public boolean checkEmailAvailability(String email){
-
+        return false;
     }
 
     /**
@@ -54,7 +57,7 @@ public class UserManager {
      * and the password is correct, otherwise Null.
      */
     public User login(String identifier, String password){
-
+        return null;
     }
 
     /**
@@ -63,7 +66,7 @@ public class UserManager {
      * @return the corresponding User object if it exists, otherwise Null.
      */
     private User searchUsers(String identifier){
-
+        return null;
     }
 
     /**
@@ -72,7 +75,7 @@ public class UserManager {
      * @return True if the given identifier is an email, otherwise false.
      */
     private boolean isEmail(String identifier){
-
+        return false;
     }
 
     /**
@@ -81,7 +84,7 @@ public class UserManager {
      * @return whether or not it is a valid email string.
      */
     private boolean verifyEmail(String email){
-
+        return false;
     }
 
     /**
@@ -90,7 +93,7 @@ public class UserManager {
      * @return whether or not it is a valid username string.
      */
     private boolean verifyUsername(String username){
-
+        return false;
     }
 
     /**

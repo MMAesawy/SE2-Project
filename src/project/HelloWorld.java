@@ -13,6 +13,8 @@ public class HelloWorld {
   }
   public static void main(String[] argv) {
     Object implementor = new HelloWorld ();
+    DatabaseManager dbManager = DatabaseManager.getInstance();
+    dbManager.connect();
     String address = "http://localhost:9000/HelloWorld";
     Endpoint.publish(address, implementor);
   }
