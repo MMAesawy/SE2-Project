@@ -1,21 +1,18 @@
 package project;
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
 
-@WebService()
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+// The Java class will be hosted at the URI path "/helloworld"
+@Path("/helloworld")
 public class HelloWorld {
-  @WebMethod
-  public String sayHelloWorldFrom(String from) {
-    String result = "Hello, world, from " + from;
-    System.out.println(result);
-    return result;
-  }
-  public static void main(String[] argv) {
-    Object implementor = new HelloWorld ();
-    DatabaseManager dbManager = DatabaseManager.getInstance();
-    dbManager.connect();
-    String address = "http://localhost:9000/HelloWorld";
-    Endpoint.publish(address, implementor);
+  // The Java method will process HTTP GET requests
+  @GET
+  // The Java method will produce content identified by the MIME Media type "text/plain"
+  @Produces("text/plain")
+  public String getClichedMessage() {
+    // Return some cliched textual content
+    return "Hello World";
   }
 }
