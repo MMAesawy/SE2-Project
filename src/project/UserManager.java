@@ -1,23 +1,46 @@
 package project;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.regex.*;
 
 public class UserManager {
-    protected ArrayList<User> users;
     protected DatabaseManager dbManager;
+
+    final public static Pattern EMAIL_REGEX = Pattern.compile(
+            "[a-z0-9!#$%&'*+/=?^_`{|}~-]+" +
+                    "(?:\\.[a-z0-9!#$%&'*+/=" +
+                    "?^_`{|}~-]+)*@(?:[a-z0-9](?:" +
+                    "[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9]" +
+                    "(?:[a-z0-9-]*[a-z0-9])?");
+
+    final public static Pattern USERNAME_REGEX = Pattern.compile(
+            "^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,29}$",
+            Pattern.CASE_INSENSITIVE);
+
+    final public static String BUYER_TYPE = "buyer";
+    final public static String OWNER_TYPE = "owner";
+
+
+
 
     public UserManager(){
         dbManager = DatabaseManager.getInstance();
-        loadUsers();
     }
 
     /**
      * Inserts the given user into the database
      * @param user the user object to register in the database
      */
-    public void registerUser(User user){
-
+    public void insertUser(User user){
+        String type = user instanceof Buyer ? BUYER_TYPE : OWNER_TYPE;
+        String query =
+                String.format(
+                        "INSERT INTO" +
+                                " users (email, username, password, type)" +
+                                " VALUES (%s, %s, %s, %s)"
+                        , user.email, user.username, user.password, type);
+        dbManager.update(query);
     }
 
     /**
@@ -26,7 +49,13 @@ public class UserManager {
      * @param user the user to be deleted
      */
     public void deleteUser(User user){
-
+        String query =
+                String.format(
+                        "DELETE FROM" +
+                                " users WHERE" +
+                                " email = %s AND username = %s"
+                        , user.email, user.username);
+        dbManager.update(query);
     }
 
     /**
@@ -34,8 +63,13 @@ public class UserManager {
      * @param username the username to check
      * @return whether or not the username is available
      */
-    public boolean checkUsernameAvailability(String username){
-        return false;
+    public boolean checkUsernameAvailability(String username)
+    {
+        String query =
+                String.format(
+                        "SELECT * FROM users WHERE username = %s"
+                        , username);
+        return !checkExists(query);
     }
 
     /**
@@ -44,8 +78,34 @@ public class UserManager {
      * @return whether or not the email is available
      */
     public boolean checkEmailAvailability(String email){
-        return false;
+        String query =
+                String.format(
+                        "SELECT * FROM users WHERE email = %s"
+                        , email);
+        return !checkExists(query);
     }
+
+
+    /**
+     * Generic record checker. Checks if the given select query returns any results.
+     * @param selectQuery the selection query
+     * @return true if the query returns any results, false otherwise.
+     */
+    private boolean checkExists(String selectQuery){
+        ResultSet result = dbManager.select(selectQuery);
+        boolean available = false;
+        try {
+            // result.next() returns false if there are no records
+            available = result.next();
+        }
+        catch( SQLException e ){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        return available;
+    }
+
+
 
     /**
      * Searches for and returns a User with a given identifier and password.
@@ -57,6 +117,10 @@ public class UserManager {
      * and the password is correct, otherwise Null.
      */
     public User login(String identifier, String password){
+        User user = searchUser(identifier);
+        if (user != null && user.checkPassword(password)){
+            return user;
+        }
         return null;
     }
 
@@ -65,8 +129,48 @@ public class UserManager {
      * @param identifier email/username of the User
      * @return the corresponding User object if it exists, otherwise Null.
      */
-    private User searchUsers(String identifier){
-        return null;
+    private User searchUser(String identifier){
+        String clause;
+        if (isEmail(identifier)){
+            clause = String.format("email = %s", identifier);
+        }
+        else{
+            clause = String.format("username = %s", identifier);
+        }
+        String query =
+                String.format(
+                        "SELECT email, username, password" +
+                                " FROM users WHERE %s", clause);
+        ResultSet result = dbManager.select(query);
+        return constructUser(result);
+    }
+
+    /**
+     * Constructs the appropriate User object from a SQL ResultSet
+     * @param resultSet the ResultSet to construct the user from
+     * @return the appropriate User object. Returns null if query has no results.
+     */
+    private User constructUser(ResultSet resultSet){
+        User user = null;
+        try {
+            if (resultSet.next()){
+                String email = resultSet.getString(1);
+                String username = resultSet.getString(2);
+                String password = resultSet.getString(3);
+                String type = resultSet.getString(4);
+                if (type.equals(BUYER_TYPE)){
+                    user = new Buyer(email, username, password);
+                }
+                else {
+                    user = new StoreOwner(email, username, password);
+                }
+            }
+        }
+        catch( SQLException e ){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        return user;
     }
 
     /**
@@ -75,7 +179,7 @@ public class UserManager {
      * @return True if the given identifier is an email, otherwise false.
      */
     private boolean isEmail(String identifier){
-        return false;
+        return EMAIL_REGEX.matcher(identifier).matches();
     }
 
     /**
@@ -84,7 +188,7 @@ public class UserManager {
      * @return whether or not it is a valid email string.
      */
     private boolean verifyEmail(String email){
-        return false;
+        return isEmail(email);
     }
 
     /**
@@ -93,13 +197,6 @@ public class UserManager {
      * @return whether or not it is a valid username string.
      */
     private boolean verifyUsername(String username){
-        return false;
-    }
-
-    /**
-     * Loads the users from the database into the ArrayList users object.
-     */
-    private void loadUsers(){
-
+        return USERNAME_REGEX.matcher(username).matches();
     }
 }
