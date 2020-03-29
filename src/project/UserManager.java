@@ -2,6 +2,7 @@ package project;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.regex.*;
 
 public class UserManager {
@@ -21,6 +22,11 @@ public class UserManager {
 
     final public static String BUYER_TYPE = "buyer";
     final public static String OWNER_TYPE = "owner";
+
+    public enum errors {
+        OK, INCORRECT_PASSWORD, EMAIL_NOT_AVAILABLE,
+        EMAIL_INVALID, USERNAME_NOT_AVAILABLE, USERNAME_INVALID
+    }
 
     public static UserManager getInstance(){
         if (instance == null){
@@ -45,6 +51,33 @@ public class UserManager {
                                 " VALUES (%s, %s, %s, %s)"
                         , user.getEmail(), user.getUsername(), user.getPassword(), type);
         dbManager.update(query);
+    }
+
+    public ArrayList<errors> registerUser(User user){
+        ArrayList<errors> errorList = registrationCheck(user);
+        if (errorList.isEmpty() || errorList.get(0) == UserManager.errors.OK){
+            insertUser(user);
+        }
+        return errorList;
+    }
+
+    private ArrayList<errors> registrationCheck(User user){
+        ArrayList<errors> errorList = new ArrayList<>();
+        if (!verifyUsername(user.getUsername())){
+            errorList.add(UserManager.errors.USERNAME_INVALID);
+        }
+        if (!checkUsernameAvailability(user.getUsername())){
+            errorList.add(UserManager.errors.USERNAME_NOT_AVAILABLE);
+        }
+        if (!verifyEmail(user.getEmail())){
+            errorList.add(UserManager.errors.EMAIL_INVALID);
+        }
+        if (!checkEmailAvailability(user.getEmail())){
+            errorList.add(UserManager.errors.EMAIL_NOT_AVAILABLE);
+        }
+
+        if (errorList.isEmpty()) errorList.add(UserManager.errors.OK);
+        return errorList;
     }
 
     /**
