@@ -1,9 +1,14 @@
 package project;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.*;
 
+//@Path("/register")
 public class UserManager {
     protected DatabaseManager dbManager;
 
@@ -32,6 +37,10 @@ public class UserManager {
      * Inserts the given user into the database
      * @param user the user object to register in the database
      */
+
+//    @GET
+//    @Path("/insert")
+//    @Produces("text/plain")
     public void insertUser(User user){
         String type = user instanceof Buyer ? BUYER_TYPE : OWNER_TYPE;
         String query =
@@ -41,6 +50,7 @@ public class UserManager {
                                 " VALUES (%s, %s, %s, %s)"
                         , user.email, user.username, user.password, type);
         dbManager.update(query);
+//        System.out.print("I'm here!");
     }
 
     /**
