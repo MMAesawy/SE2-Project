@@ -55,9 +55,17 @@ public class API {
     @Path("/login")
     @Produces("XML")
     public Response login(
-            @FormParam("username") String username,
-            @FormParam("email") String email
+            @FormParam("identifier") String identifier,
+            @FormParam("password") String password
     ){
+        UserManager userManager = UserManager.getInstance();
+        User result = userManager.login(identifier, password);
 
+        if (result == null){ // username, email, or password is incorrect
+
+        }
+        else{
+            // TODO return the users details ???
+        }
     }
 }
