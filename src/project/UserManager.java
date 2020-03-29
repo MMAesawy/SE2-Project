@@ -1,16 +1,12 @@
 package project;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.*;
 
-//@Path("/register")
 public class UserManager {
-    protected DatabaseManager dbManager;
+    private DatabaseManager dbManager = DatabaseManager.getInstance();
+    private static UserManager instance;
 
     final public static Pattern EMAIL_REGEX = Pattern.compile(
             "[a-z0-9!#$%&'*+/=?^_`{|}~-]+" +
@@ -26,21 +22,20 @@ public class UserManager {
     final public static String BUYER_TYPE = "buyer";
     final public static String OWNER_TYPE = "owner";
 
+    public static UserManager getInstance(){
+        if (instance == null){
+            instance = new UserManager();
+        }
+        return instance;
+    }
 
-
-
-    public UserManager(){
-        dbManager = DatabaseManager.getInstance();
+    private UserManager(){
     }
 
     /**
      * Inserts the given user into the database
      * @param user the user object to register in the database
      */
-
-//    @GET
-//    @Path("/insert")
-//    @Produces("text/plain")
     public void insertUser(User user){
         String type = user instanceof Buyer ? BUYER_TYPE : OWNER_TYPE;
         String query =
@@ -50,7 +45,6 @@ public class UserManager {
                                 " VALUES (%s, %s, %s, %s)"
                         , user.email, user.username, user.password, type);
         dbManager.update(query);
-//        System.out.print("I'm here!");
     }
 
     /**
