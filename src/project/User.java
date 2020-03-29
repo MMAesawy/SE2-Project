@@ -1,9 +1,9 @@
 package project;
 
 public abstract class User {
-    protected String email;
-    protected String username;
-    protected String password;
+    private String email;
+    private String username;
+    private String password;
 
     public User(String email, String username, String password) {
         this.email = email;

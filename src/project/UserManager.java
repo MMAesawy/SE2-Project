@@ -43,7 +43,7 @@ public class UserManager {
                         "INSERT INTO" +
                                 " users (email, username, password, type)" +
                                 " VALUES (%s, %s, %s, %s)"
-                        , user.email, user.username, user.password, type);
+                        , user.getEmail(), user.getUsername(), user.getPassword(), type);
         dbManager.update(query);
     }
 
@@ -58,7 +58,7 @@ public class UserManager {
                         "DELETE FROM" +
                                 " users WHERE" +
                                 " email = %s AND username = %s"
-                        , user.email, user.username);
+                        , user.getEmail(), user.getUsername());
         dbManager.update(query);
     }
 
