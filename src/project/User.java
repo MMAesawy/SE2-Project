@@ -1,5 +1,8 @@
 package project;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public abstract class User {
     private String email;
     private String username;
@@ -9,6 +12,9 @@ public abstract class User {
         this.email = email;
         this.username = username;
         this.password = password;
+    }
+
+    public User() {
     }
 
     public String getEmail() {
