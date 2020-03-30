@@ -6,6 +6,7 @@ import java.sql.*;
  * Class for handling connecting and querying from the database.
  */
 public class DatabaseManager {
+    final private static String CONNECTION_STRING = "jdbc:sqlite:database.db";
     private Connection connection = null;
     private static DatabaseManager instance = null;
 
@@ -28,7 +29,7 @@ public class DatabaseManager {
         if (isConnected()) return; // already connected, don't reconnect.
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:database.db");
+            connection = DriverManager.getConnection(CONNECTION_STRING);
             //connection.
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
