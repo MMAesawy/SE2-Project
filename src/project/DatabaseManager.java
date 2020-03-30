@@ -29,8 +29,10 @@ public class DatabaseManager {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:database.db");
+            //connection.
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            e.printStackTrace();
             System.exit(0);
         }
         System.out.println("Opened database successfully");
@@ -43,6 +45,7 @@ public class DatabaseManager {
             }
             catch ( SQLException e ) {
                 System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+                e.printStackTrace();
                 System.exit(0);
             }
             connection = null;
@@ -62,9 +65,10 @@ public class DatabaseManager {
         }
         catch ( SQLException e ){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            e.printStackTrace();
             System.exit(0);
         }
-        if (autoConnect) close();
+        //if (autoConnect) close();
         System.out.println("Executed " + query);
     }
 
@@ -78,13 +82,14 @@ public class DatabaseManager {
         try {
             Statement stmt = connection.createStatement();
             rs = stmt.executeQuery(query);
-            stmt.close();
+            stmt.closeOnCompletion();
         }
         catch ( SQLException e ){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            e.printStackTrace();
             System.exit(0);
         }
-        if (autoConnect) close();
+        //if (autoConnect) close();
         System.out.println("Executed " + query);
         return rs;
     }

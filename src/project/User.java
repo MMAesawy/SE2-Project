@@ -29,6 +29,10 @@ public abstract class User {
         return password;
     }
 
+    public String toString(){
+        return String.format("Username: %s, Email: %s, Password: %s", username, email, password);
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }

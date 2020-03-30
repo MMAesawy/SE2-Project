@@ -48,9 +48,10 @@ public class UserManager {
                 String.format(
                         "INSERT INTO" +
                                 " users (email, username, password, type)" +
-                                " VALUES (%s, %s, %s, %s)"
+                                " VALUES (\"%s\", \"%s\", \"%s\", \"%s\")"
                         , user.getEmail(), user.getUsername(), user.getPassword(), type);
         dbManager.update(query);
+        dbManager.close();
     }
 
     public ArrayList<errors> registerUser(User user){
@@ -90,7 +91,7 @@ public class UserManager {
                 String.format(
                         "DELETE FROM" +
                                 " users WHERE" +
-                                " email = %s AND username = %s"
+                                " email = \"%s\" AND username = \"%s\""
                         , user.getEmail(), user.getUsername());
         dbManager.update(query);
     }
@@ -104,7 +105,7 @@ public class UserManager {
     {
         String query =
                 String.format(
-                        "SELECT * FROM users WHERE username = %s"
+                        "SELECT * FROM users WHERE username = \"%s\""
                         , username);
         return !checkExists(query);
     }
@@ -117,7 +118,7 @@ public class UserManager {
     public boolean checkEmailAvailability(String email){
         String query =
                 String.format(
-                        "SELECT * FROM users WHERE email = %s"
+                        "SELECT * FROM users WHERE email = \"%s\""
                         , email);
         return !checkExists(query);
     }
@@ -134,11 +135,15 @@ public class UserManager {
         try {
             // result.next() returns false if there are no records
             available = result.next();
+            result.close();
+            dbManager.close();
         }
         catch( SQLException e ){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            e.printStackTrace();
             System.exit(0);
         }
+
         return available;
     }
 
@@ -155,6 +160,8 @@ public class UserManager {
      */
     public User login(String identifier, String password){
         User user = searchUser(identifier);
+        System.out.print("Login returned user: ");
+        System.out.println((user != null ? user : "null"));
         if (user != null && user.checkPassword(password)){
             return user;
         }
@@ -169,14 +176,14 @@ public class UserManager {
     private User searchUser(String identifier){
         String clause;
         if (isEmail(identifier)){
-            clause = String.format("email = %s", identifier);
+            clause = String.format("email = \"%s\"", identifier);
         }
         else{
-            clause = String.format("username = %s", identifier);
+            clause = String.format("username = \"%s\"", identifier);
         }
         String query =
                 String.format(
-                        "SELECT email, username, password" +
+                        "SELECT email, username, password, type" +
                                 " FROM users WHERE %s", clause);
         ResultSet result = dbManager.select(query);
         return constructUser(result);
@@ -190,7 +197,9 @@ public class UserManager {
     private User constructUser(ResultSet resultSet){
         User user = null;
         try {
-            if (resultSet.next()){
+            boolean hasNext = resultSet.next();
+            System.out.println(resultSet);
+            if (hasNext){
                 String email = resultSet.getString(1);
                 String username = resultSet.getString(2);
                 String password = resultSet.getString(3);
@@ -202,9 +211,13 @@ public class UserManager {
                     user = new StoreOwner(email, username, password);
                 }
             }
+            else System.out.println("constructUser did not find any users in query result.");
+            resultSet.close();
+            dbManager.close();
         }
         catch( SQLException e ){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            e.printStackTrace();
             System.exit(0);
         }
         return user;
