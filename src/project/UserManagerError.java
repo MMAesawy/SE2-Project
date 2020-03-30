@@ -1,0 +1,6 @@
+package project;
+
+public enum UserManagerError {
+    OK, INCORRECT_PASSWORD, EMAIL_NOT_AVAILABLE,
+    EMAIL_INVALID, USERNAME_NOT_AVAILABLE, USERNAME_INVALID
+}

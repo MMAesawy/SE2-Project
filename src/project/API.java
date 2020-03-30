@@ -31,13 +31,13 @@ public class API {
         else{
             user = new StoreOwner(email, username, password);
         }
-        ArrayList<UserManager.errors> result = userManager.registerUser(user);
+        ArrayList<UserManagerError> result = userManager.registerUser(user);
 
         // registration has not occured due to errors
         ArrayList<APIError> errors = new ArrayList<>();
         APIError e;
-        if (!result.isEmpty() && result.get(0) != UserManager.errors.OK){
-            for (UserManager.errors error : result){
+        if (!result.isEmpty() && result.get(0) != UserManagerError.OK){
+            for (UserManagerError error : result){
                 switch (error){
                     case USERNAME_INVALID:
                         e = new APIError("Username is invalid.");

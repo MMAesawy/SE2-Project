@@ -23,11 +23,6 @@ public class UserManager {
     final public static String BUYER_TYPE = "buyer";
     final public static String OWNER_TYPE = "owner";
 
-    public enum errors {
-        OK, INCORRECT_PASSWORD, EMAIL_NOT_AVAILABLE,
-        EMAIL_INVALID, USERNAME_NOT_AVAILABLE, USERNAME_INVALID
-    }
-
     public static UserManager getInstance(){
         if (instance == null){
             instance = new UserManager();
@@ -54,30 +49,30 @@ public class UserManager {
         dbManager.close();
     }
 
-    public ArrayList<errors> registerUser(User user){
-        ArrayList<errors> errorList = registrationCheck(user);
-        if (errorList.isEmpty() || errorList.get(0) == UserManager.errors.OK){
+    public ArrayList<UserManagerError> registerUser(User user){
+        ArrayList<UserManagerError> errorList = registrationCheck(user);
+        if (errorList.isEmpty() || errorList.get(0) == UserManagerError.OK){
             insertUser(user);
         }
         return errorList;
     }
 
-    private ArrayList<errors> registrationCheck(User user){
-        ArrayList<errors> errorList = new ArrayList<>();
+    private ArrayList<UserManagerError> registrationCheck(User user){
+        ArrayList<UserManagerError> errorList = new ArrayList<>();
         if (!verifyUsername(user.getUsername())){
-            errorList.add(UserManager.errors.USERNAME_INVALID);
+            errorList.add(UserManagerError.USERNAME_INVALID);
         }
         if (!checkUsernameAvailability(user.getUsername())){
-            errorList.add(UserManager.errors.USERNAME_NOT_AVAILABLE);
+            errorList.add(UserManagerError.USERNAME_NOT_AVAILABLE);
         }
         if (!verifyEmail(user.getEmail())){
-            errorList.add(UserManager.errors.EMAIL_INVALID);
+            errorList.add(UserManagerError.EMAIL_INVALID);
         }
         if (!checkEmailAvailability(user.getEmail())){
-            errorList.add(UserManager.errors.EMAIL_NOT_AVAILABLE);
+            errorList.add(UserManagerError.EMAIL_NOT_AVAILABLE);
         }
 
-        if (errorList.isEmpty()) errorList.add(UserManager.errors.OK);
+        if (errorList.isEmpty()) errorList.add(UserManagerError.OK);
         return errorList;
     }
 
