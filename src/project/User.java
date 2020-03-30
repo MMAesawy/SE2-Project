@@ -1,14 +1,20 @@
 package project;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public abstract class User {
-    protected String email;
-    protected String username;
-    protected String password;
+    private String email;
+    private String username;
+    private String password;
 
     public User(String email, String username, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
+    }
+
+    public User() {
     }
 
     public String getEmail() {
@@ -21,6 +27,10 @@ public abstract class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String toString(){
+        return String.format("Username: %s, Email: %s, Password: %s", username, email, password);
     }
 
     public void setEmail(String email) {
