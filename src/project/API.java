@@ -25,11 +25,14 @@ public class API {
                 "username: %s, email: %s, password: %s, type: %s", username, email, password, type));
         UserManager userManager = UserManager.getInstance();
         User user = null;
-        if (type.equals(UserManager.BUYER_TYPE)){
-            user = new Buyer(email, username, password);
+        if (type.equals(UserFactory.ADMIN_TYPE)){
+            System.out.println("Returning HTTP 400 response...");
+            APIError error = new APIError("Invalid user type");
+            return Response.status(400)
+                    .entity(error).build();
         }
         else{
-            user = new StoreOwner(email, username, password);
+            user = UserFactory.makeUser(email, username, password, type);
         }
         ArrayList<UserManagerError> result = userManager.registerUser(user);
 
@@ -95,5 +98,15 @@ public class API {
             System.out.println("Returning HTTP 200 response...");
             return Response.status(200).entity(result).build();
         }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/getAllUsers")
+    public Response getAllUsers(){
+        UserManager userManager = UserManager.getInstance();
+        ArrayList<User> users = userManager.getAllUsers();
+        return Response.status(200)
+                .entity(new GenericEntity<List<User>>(users){}).build();
     }
 }

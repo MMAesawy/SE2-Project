@@ -41,6 +41,8 @@ public abstract class User {
         this.username = username;
     }
 
+//    public void setPassword(String password) { this.password = password; }
+
     /**
      * Checks if the given password matches this user's actual password.
      * @param password the password to check
