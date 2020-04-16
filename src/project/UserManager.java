@@ -171,7 +171,7 @@ public class UserManager {
      * @param identifier email/username of the User
      * @return the corresponding User object if it exists, otherwise Null.
      */
-    private User searchUser(String identifier){
+    public User searchUser(String identifier){
         String clause;
         if (isEmail(identifier)){
             clause = String.format("email = \"%s\"", identifier);
