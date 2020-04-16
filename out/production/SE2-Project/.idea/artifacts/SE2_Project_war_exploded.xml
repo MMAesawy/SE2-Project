@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" build-on-make="true" name="SE2-Project:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/SE2_Project_war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="SE2-Project" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="application" name="JAX-RS-2.1.1" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/jaxrs-ri-2.30.1.jar" />
+          <element id="library" level="project" name="lib" />
+          <element id="library" level="project" name="hk2-api-2.6.1" />
+          <element id="library" level="project" name="jackson-annotations-2.10.3" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="SE2-Project/web/Web" />
+    </root>
+  </artifact>
+</component>

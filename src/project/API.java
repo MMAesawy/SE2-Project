@@ -38,6 +38,13 @@ public class API {
         else{
             user = UserFactory.makeUser(email, username, password, type);
         }
+
+        if (user == null){
+            APIError error = new APIError("Invalid user type");
+            return Response.status(400)
+                    .entity(error).build();
+        }
+
         ArrayList<UserManagerError> result = userManager.registerUser(user);
 
         // registration has not occured due to errors
