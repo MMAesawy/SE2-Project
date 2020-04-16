@@ -20,9 +20,6 @@ public class UserManager {
             "^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,29}$",
             Pattern.CASE_INSENSITIVE);
 
-    final public static String BUYER_TYPE = "buyer";
-    final public static String OWNER_TYPE = "owner";
-
     public static UserManager getInstance(){
         if (instance == null){
             instance = new UserManager();
@@ -30,15 +27,14 @@ public class UserManager {
         return instance;
     }
 
-    private UserManager(){
-    }
+    private UserManager(){}
 
     /**
      * Inserts the given user into the database
      * @param user the user object to register in the database
      */
     public void insertUser(User user){
-        String type = user instanceof Buyer ? BUYER_TYPE : OWNER_TYPE;
+        String type = UserFactory.getType(user);
         String query =
                 String.format(
                         "INSERT INTO" +
@@ -142,6 +138,13 @@ public class UserManager {
         return available;
     }
 
+    public ArrayList<User> getAllUsers(){
+        String query = "SELECT * FROM users;";
+        ResultSet result = dbManager.select(query);
+        ArrayList<User> users = UserFactory.makeUsers(result);
+        dbManager.close();
+        return users;
+    }
 
 
     /**
@@ -168,7 +171,7 @@ public class UserManager {
      * @param identifier email/username of the User
      * @return the corresponding User object if it exists, otherwise Null.
      */
-    private User searchUser(String identifier){
+    public User searchUser(String identifier){
         String clause;
         if (isEmail(identifier)){
             clause = String.format("email = \"%s\"", identifier);
@@ -181,41 +184,12 @@ public class UserManager {
                         "SELECT email, username, password, type" +
                                 " FROM users WHERE %s", clause);
         ResultSet result = dbManager.select(query);
-        return constructUser(result);
-    }
-
-    /**
-     * Constructs the appropriate User object from a SQL ResultSet
-     * @param resultSet the ResultSet to construct the user from
-     * @return the appropriate User object. Returns null if query has no results.
-     */
-    private User constructUser(ResultSet resultSet){
-        User user = null;
-        try {
-            boolean hasNext = resultSet.next();
-            System.out.println(resultSet);
-            if (hasNext){
-                String email = resultSet.getString(1);
-                String username = resultSet.getString(2);
-                String password = resultSet.getString(3);
-                String type = resultSet.getString(4);
-                if (type.equals(BUYER_TYPE)){
-                    user = new Buyer(email, username, password);
-                }
-                else {
-                    user = new StoreOwner(email, username, password);
-                }
-            }
-            else System.out.println("constructUser did not find any users in query result.");
-            resultSet.close();
-            dbManager.close();
+        ArrayList<User> users = UserFactory.makeUsers(result);
+        dbManager.close();
+        if (users.isEmpty()){
+            return null;
         }
-        catch( SQLException e ){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            e.printStackTrace();
-            System.exit(0);
-        }
-        return user;
+        return users.get(0);
     }
 
     /**

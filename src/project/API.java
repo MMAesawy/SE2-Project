@@ -2,6 +2,7 @@ package project;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -10,6 +11,9 @@ import java.util.List;
 // The Java class will be hosted at the URI path "/helloworld"
 @Path("/api")
 public class API {
+
+    public final static String AUTHENTICATION_SCHEME = "Bearer";
+
     // The Java method will process HTTP GET requests
     @POST
     @Consumes(MediaType.APPLICATION_XML)
@@ -25,11 +29,14 @@ public class API {
                 "username: %s, email: %s, password: %s, type: %s", username, email, password, type));
         UserManager userManager = UserManager.getInstance();
         User user = null;
-        if (type.equals(UserManager.BUYER_TYPE)){
-            user = new Buyer(email, username, password);
+        if (type.equals(UserFactory.ADMIN_TYPE)){
+            System.out.println("Returning HTTP 400 response...");
+            APIError error = new APIError("Invalid user type");
+            return Response.status(400)
+                    .entity(error).build();
         }
         else{
-            user = new StoreOwner(email, username, password);
+            user = UserFactory.makeUser(email, username, password, type);
         }
         ArrayList<UserManagerError> result = userManager.registerUser(user);
 
@@ -74,6 +81,65 @@ public class API {
         return Response.status(201).build();
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/getMyInfo")
+    public Response getMyInfo(
+            @HeaderParam(HttpHeaders.AUTHORIZATION) String token
+    ){
+        token = stripAuthenticationHeader(token); // strip Bearer
+
+        Privilege privilege = AuthorizationService.verifyToken(token);
+        UserManager userManager = UserManager.getInstance();
+
+        User user = null;
+        if (privilege != null)
+            user = userManager.searchUser(privilege.getUsername());
+
+        if (privilege == null || user == null){ // invalid or expired token
+            APIError e = new APIError("Invalid or expired token.");
+            System.err.println(e);
+            System.out.println("Returning HTTP 401 response...");
+            return Response.status(401).entity(e).build();
+        }
+        else{
+            System.out.println("Returning HTTP 200 response...");
+            return Response.status(200).entity(user).build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Path("/getUserInfo")
+    public Response getUserInfo(
+            @HeaderParam(HttpHeaders.AUTHORIZATION) String token,
+            @QueryParam("identifier") String identifier
+    ){
+        token = stripAuthenticationHeader(token); // strip Bearer
+
+        Privilege privilege = AuthorizationService.verifyToken(token);
+        UserManager userManager = UserManager.getInstance();
+
+        if (privilege == null){
+            return Response.status(401).build();
+        }
+
+        User user = userManager.searchUser(identifier);
+
+        if (user == null){
+            return Response.status(404).build();
+        }
+
+        if (privilege.getAccessType() == AccessType.ADMIN
+                || privilege.getUsername().equals(user.getUsername())){
+            System.out.println("Returning HTTP 200 response...");
+            return Response.status(200).entity(user).build();
+        }
+
+        return Response.status(403).build();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
@@ -93,7 +159,35 @@ public class API {
         }
         else{
             System.out.println("Returning HTTP 200 response...");
-            return Response.status(200).entity(result).build();
+            String token = AuthorizationService.generateToken(result);
+            return Response.status(200).entity(token).build();
         }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/getAllUsers")
+    public Response getAllUsers(
+            @HeaderParam(HttpHeaders.AUTHORIZATION) String token
+    ){
+        token = stripAuthenticationHeader(token); // strip Bearer
+        Privilege privilege = AuthorizationService.verifyToken(token);
+
+        if (privilege == null){
+            return Response.status(401).build();
+        }
+
+        if (privilege.getAccessType() != AccessType.ADMIN){
+            return Response.status(403).build();
+        }
+
+        UserManager userManager = UserManager.getInstance();
+        ArrayList<User> users = userManager.getAllUsers();
+        return Response.status(200)
+                .entity(new GenericEntity<List<User>>(users){}).build();
+    }
+
+    private String stripAuthenticationHeader(String header){
+        return header.substring(AUTHENTICATION_SCHEME.length()).trim();
     }
 }
