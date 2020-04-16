@@ -6,7 +6,7 @@ import java.sql.*;
  * Class for handling connecting and querying from the database.
  */
 public class DatabaseManager {
-    final private static String CONNECTION_STRING = "jdbc:sqlite:database.db";
+    final private static String CONNECTION_STRING = "jdbc:sqlite:/db/database.db";
     private Connection connection = null;
     private static DatabaseManager instance = null;
 

@@ -21,7 +21,7 @@ public class AuthorizationService {
 
     private final static String USERNAME_CLAIM_STRING = "username";
     private final static String ACCESS_CLAIM_STRING = "access";
-    private final static long TOKEN_EXPIRY_TIME = 1 * 60 * 1000; // 1 minute
+    private final static long TOKEN_EXPIRY_TIME = 5 * 60 * 1000; // 5 mins.
 
     public static String generateToken(User user){
         String privilege = getAccessString(user);

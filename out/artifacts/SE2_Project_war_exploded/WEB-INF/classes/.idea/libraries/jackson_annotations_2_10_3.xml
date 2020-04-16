@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="jackson-annotations-2.10.3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jackson-annotations-2.10.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jackson-core-2.10.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jackson-databind-2.10.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jackson-jaxrs-base-2.10.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jackson-jaxrs-json-provider-2.10.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jackson-module-jaxb-annotations-2.10.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jakarta.el-4.0.0-RC1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/jakarta.json-2.0.0-RC2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
